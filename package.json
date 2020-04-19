@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/romefar/csv_to_json_parser/issues"
   },
-  "homepage": "https://github.com/romefar/csv_to_json_parser#readme"
+  "homepage": "https://github.com/romefar/csv_to_json_parser#readme",
+  "dependencies": {
+    "chalk": "^4.0.0"
+  }
 }
