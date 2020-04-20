@@ -4,7 +4,7 @@
   "description": "CSV to JSON parser.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "babel-node app.js"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,12 @@
   "homepage": "https://github.com/romefar/csv_to_json_parser#readme",
   "dependencies": {
     "chalk": "^4.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.5"
   }
 }
