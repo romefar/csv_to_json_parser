@@ -1,8 +1,8 @@
 const fs = require('fs') 
 const path = require('path')
 const { Writable, Readable, Transform,finished } = require('stream')
-const server = require("http").createServer();
-const fileName = "test.csv"
+const fileName = "small_test.csv"
+const { ParseCSVStream } = require('./parseCSVStream')
 const filePath = path.join(__dirname, fileName)
 const header = `cdatetime,address,district,beat,grid,crimedescr,ucr_ncic_code,latitude,longitude`
 let content = `\n1/1/06 0:00,3108 OCCIDENTAL DR,3,3C        ,1115,10851(A)VC TAKE VEH W/O OWNER,2404,38.55042047,-121.3914158
@@ -45,55 +45,35 @@ const createBigFile = () => {
     file.end()
 }
 
-const inStream = new Readable({
-    read(size) {
-        this.push(String.fromCharCode(this.currentCharCode++));
-        if (this.currentCharCode > 90) {
-          this.push(null);
-        }
-      }
-})
-
-// const outStream = new Writable({
-//     write(chunk, encoding, callback) {
-//         let data = chunk.toString().split('\\n')
-//         data.pop()
-//         let res = data.map(item => {
-//             return item.split(',').map(item => item.trim())
-//         })
-//         console.log(res)
-//         callback()
-//     }
-// })
-// inStream.currentCharCode = 65;
-// inStream.pipe(process.stdout)
-// process.stdin.pipe(outStream)
 // createBigFile()
 
 
-// server.on("request", (req, res) => {
-//     fs.readFile(filePath, (err, data) => { // ~ 4 GB RAM usage
-//         if (err) throw err;
 
-//         res.end(data);
-//     });
-//     // const src = fs.createReadStream(filePath)
-//     // src.pipe(res)
-//   });
-  
-//   server.listen(8000, () => {
-//       console.log(`Server is up in port 8080.`)
-//   });
+
 let isHeader = true
-let isFirst = true
 let headers = []
 let buffer = null
 let isPart = false
 let arr = null
-let isEnd = false
-let istest = 0
 let size = 0
 let endSize = fs.statSync(filePath).size
+let possibleSep = [',', '-','_', '#', ';', ':', '|', '*', '^']
+
+const anylizer = ([firstRow, secondRow]) => {
+    let firstRowMap = new Map()
+    let secondRowMap = new Map()
+    
+    possibleSep.forEach(item => firstRowMap.set(item, firstRow.split(item).length))
+    possibleSep.forEach(item => secondRowMap.set(item, secondRow.split(item).length))
+    let [firstSep, firstSepCount] = [...firstRowMap.entries()].reduce((acc, item) => item[1] > acc[1] ? item : acc)
+    let [secondSep, secondSepCount] = [...secondRowMap.entries()].reduce((acc, item) => item[1] > acc[1] ? item : acc)
+
+    if(firstSep === secondSep && firstSepCount === secondSepCount) { 
+        return firstSep
+    } else { 
+        throw new Error("Couldn't determine a separtor.")
+    }
+} 
 
 const parseStream = new Transform({
     transform(chunk, encoding, cb)  {
@@ -101,15 +81,11 @@ const parseStream = new Transform({
         size += chunk.length
 
         if(buffer) { 
-            // console.log(buffer, "------" , data.split('\n')[0], data.split('\n')[0] === " ")
-        //   console.log(data[0] === " ")
             data = buffer + data
-            // console.log("SLICEe " + data.slice(0, 20))
-            // console.log(buffer + data[0])
-            // console.log(data.split('\n')[0])
             buffer = null
             isPart = false
         }
+
         arr = data.split('\n')
         if(isHeader) { 
             headers = arr.shift().trim().split(",")
@@ -120,10 +96,6 @@ const parseStream = new Transform({
         if(lastChar !== '\n' && !isHeader) { 
             isPart = true
         } 
-
-        if(istest === 8) { 
-            console.log(arr)
-        }
 
         if(isPart) { 
             buffer = arr.pop()
@@ -147,6 +119,14 @@ const parseStream = new Transform({
 }
 )
 
-fs.createReadStream('./test.csv')
-    .pipe(parseStream)
-    .pipe(fs.createWriteStream('./test.json'))
+const testStream = new ParseCSVStream({}, fs.statSync(filePath).size, ',' )
+fs.createReadStream('./small_test.csv')
+    .pipe(testStream)
+    .pipe(fs.createWriteStream('./small_te_test.json'))
+
+// console.log(anylizer(
+//     "cdatetime,address,district,beat,grid,crimedescr,ucr_ncic_code,latitude,longitude",
+//     "1/1/06 0:00,3108 OCCIDENTAL DR,3,3C        ,1115,10851(A)VC TAKE VEH W/O OWNER,2404,38.55042047,-121.1320"
+// ))
+
+// console.log(process.argv)
