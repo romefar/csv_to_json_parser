@@ -76,7 +76,7 @@ class Parser {
   /**
      * Generates a mock file with the given size in Mb.
      * @param {number} [mockSize = 800] - Approximately mock file size in MB.
-     * @param {string} customPath - A path to a mock file. If file doesn't exist than it will be created.
+     * @param {string} customPath - A path to a mock file. If there is no such file the new one will be created.
      */
   generateMockFile (mockSize = 800, customPath) {
     try {

@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "CSV to JSON parser.",
   "main": "app.js",
-  "scripts": {
-    "lint": "eslint ./src --fix"
+  "bin": {
+    "csv-parser": "./index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/romefar/csv_to_json_parser.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "romefar",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/romefar/csv_to_json_parser/issues"

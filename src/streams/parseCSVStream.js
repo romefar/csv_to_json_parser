@@ -6,7 +6,7 @@ class ParseCSVStream extends Transform {
      * A custom transform stream to parse *.csv to *.json files.
      * @param {object} options - Options object passed to both Writable and Readable constructors.
      * @param {number} fileSize - The size of the source *.csv file in bytes.
-     * @param {string} separator - A string that identifies character or characters to use in separating the string in *.csv files.
+     * @param {string} separator - A string that identifies character or characters to use in separating the strings in *.csv files.
      */
   constructor (options = {}, fileSize, separator) {
     super(options)

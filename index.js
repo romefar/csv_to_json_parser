@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const yargs = require('yargs')
 const Parser = require('./src/parser/parser')
 const parser = new Parser()
