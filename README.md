@@ -1,5 +1,6 @@
 # CSV <=> JSON parser
 TEST UPLOAD! DO NOT USE IT. 
+
 A simple parser that provides CSV to JSON and JSON to CSV parsing. Includes three commands:
 
 - createCSVMock - generates a mock file;
@@ -31,8 +32,8 @@ csv-parser createCSVMock --mockPath "./mock.csv" --size 20
 
 | Option | Default | Description|
 |--------|---------|------------|
-| mockPath | ** required **  | A path to a generated *.csv mock file. |
-| size | 800 | A file size in MB | 
+| mockPath | **required**  | A path to a generated *.csv mock file. |
+| size | 800 | File size in MB | 
 
 ---
 
