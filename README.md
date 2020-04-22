@@ -77,7 +77,6 @@ csv-parser jsonToCSV --sourceFile "./mock.csv" --resultFile "./mock.json" --sepa
 
 ```
 cdatetime,address,district,beat,grid,crimedescr,ucr_ncic_code,latitude,longitude
-
 1/1/06 0:00,1326 HELMSMAN WAY,1,1B,444,1708 US THEFT OF MAIL,2310,38.60960217,-121.4918375
 
 1/1/06 0:00,2315 STOCKTON BLVD,6,6B,1005,ASSAULT WITH WEAPON - I RPT,7000,38.55426406,-121.4546045
