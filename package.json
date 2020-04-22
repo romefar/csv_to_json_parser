@@ -4,7 +4,7 @@
   "description": "CSV to JSON parser.",
   "main": "app.js",
   "scripts": {
-    "test": "babel-node app.js"
+    "lint": "eslint ./src --fix"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,12 @@
     "@babel/core": "^7.9.0",
     "@babel/node": "^7.8.7",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/preset-env": "^7.9.5"
+    "@babel/preset-env": "^7.9.5",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }
