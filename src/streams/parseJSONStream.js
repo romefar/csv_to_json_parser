@@ -1,13 +1,12 @@
 const { Transform } = require('stream')
-const { separatorDetector } = require('../utils/sepratorDetector')
 
 class ParseJSONStream extends Transform { 
     /**
      * A custom transform stream to parse *.json to *.csv files.
      * @param {object} options - Options object passed to both Writable and Readable constructors.
-     * @param {string} separator - A string that identifies character or characters to use in separating the string in *.csv files.
+     * @param {string} [separator = ','] - A string that identifies character or characters to use in separating the string in *.csv files.
      */
-    constructor(options = {}, separator = "") { 
+    constructor(options = {}, separator) { 
         super(options)
         this._isFirstChunk = true
         this._headers = []
@@ -18,11 +17,10 @@ class ParseJSONStream extends Transform {
 
     _transform(chunk, encoding, cb) { 
         let rawJSONString = this._formatJSON(chunk.toString())
-
         if(this._buffer) rawJSONString = this._buffer + rawJSONString
         
         this._arr = rawJSONString.split("},{")
-        this._separator = !this._separator ? separatorDetector(this._arr[0], this._arr[1]) : this._separator
+        this._separator = this._separator || ","
         this._buffer = this._arr.pop()
 
         if(this._isFirstChunk) this._headers = this._parseHeaders()
@@ -66,6 +64,7 @@ class ParseJSONStream extends Transform {
             let row = item.split(",")
             let csvItem = row.map((item, i) => {
                 if (isLastChunk && i === row.length - 1) item = item.replace(/[\]}]/g, "")
+       
                 return this._replaceQuotesAndTrim(this._splitJSONPair(item))
             })
             return csvItem.join(this._separator)
@@ -76,10 +75,9 @@ class ParseJSONStream extends Transform {
     _flush(callback) {
         callback(null, this._parseJSONBody(true))
     }
-
-
 }
 
 module.exports = { 
     ParseJSONStream
 }
+
