@@ -1,6 +1,6 @@
 const path = require('path')
 
-// available separators
+//Available separators.
 const possibleSep = [',', '-','_', '#', ';', ':', '|', '*', '^']
 const bodyMockFilePath = path.join(__dirname, '/mocks/body-mock.csv')
 const mockFilePath = path.join(__dirname, '/mocks/mock.csv')
