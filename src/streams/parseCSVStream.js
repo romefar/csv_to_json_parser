@@ -1,4 +1,4 @@
-const { separatorDetector } = require('../utils/sepratorDetector')
+const { separatorDetector } = require('../utils/')
 const { Transform } = require('stream')
 
 class ParseCSVStream extends Transform { 
@@ -22,10 +22,6 @@ class ParseCSVStream extends Transform {
     }
 
     _transform(chunk, encoding, cb)  {
-        if(encoding !== 'utf-8') {
-            this.emit('error', new Error('Only UTF-8 files are supported.'))
-            return cb()
-        }
         let rawCSVString = chunk.toString()
         this._readBytes += chunk.length
         this._streamHasData = this._readBytes !== this._allBytes
@@ -37,14 +33,21 @@ class ParseCSVStream extends Transform {
         }
 
         this._arr = rawCSVString.split('\n')
-        this._separator = !this._separator ? separatorDetector(this._arr[0], this._arr[1]) : this._separator
 
-        if(this._isFirstChunk) this._headers = this._arr.shift().trim().split(this._separator)
+        if(this._isFirstChunk) {
+            this._separator = separatorDetector(this._arr[0], this._arr[1], this._separator) 
+            if(typeof this._separator !== 'string') {
+               return this.emit("error", this._separator)
+            }
+            this._headers = this._arr.shift().trim().split(this._separator)
+        }
 
         let lastChar = rawCSVString[rawCSVString.length - 1]
         if(lastChar !== '\n') { 
             this._isPart = true
-        } 
+        } else { 
+            this._arr.pop()
+        }
 
         if(this._isPart) this._buffer = this._arr.pop()
 
