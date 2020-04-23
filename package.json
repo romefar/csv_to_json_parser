@@ -2,7 +2,8 @@
   "name": "csv_to_json_parser",
   "version": "1.0.0",
   "description": "CSV to JSON parser.",
-  "main": "app.js",
+  "main": "index.js",
+  "preferGlobal": true,
   "bin": {
     "csv-parser": "./index.js"
   },
