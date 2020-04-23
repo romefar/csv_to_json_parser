@@ -1,80 +1,83 @@
-const { separatorDetector } = require('../utils/sepratorDetector')
+const { separatorDetector } = require('../utils/')
 const { Transform } = require('stream')
 
-class ParseCSVStream extends Transform { 
-    /**
+class ParseCSVStream extends Transform {
+  /**
      * A custom transform stream to parse *.csv to *.json files.
      * @param {object} options - Options object passed to both Writable and Readable constructors.
-     * @param {number} fileSize - The size of the source *.csv file in bytes. 
-     * @param {string} separator - A string that identifies character or characters to use in separating the string in *.csv files.
+     * @param {number} fileSize - The size of the source *.csv file in bytes.
+     * @param {string} separator - A string that identifies character or characters to use in separating the strings in *.csv files.
      */
-    constructor(options = {}, fileSize, separator) { 
-        super(options)
-        this._isFirstChunk = true
-        this._arr = []
-        this._headers = []
-        this._buffer = null
-        this._isPart = false
-        this._readBytes = 0
-        this._allBytes = fileSize
-        this._separator = separator
-        this._streamHasData = true
+  constructor (options = {}, fileSize, separator) {
+    super(options)
+    this._isFirstChunk = true
+    this._arr = []
+    this._headers = []
+    this._buffer = null
+    this._isPart = false
+    this._readBytes = 0
+    this._allBytes = fileSize
+    this._separator = separator
+    this._streamHasData = true
+  }
+
+  _transform (chunk, encoding, cb) {
+    let rawCSVString = chunk.toString()
+    this._readBytes += chunk.length
+    this._streamHasData = this._readBytes !== this._allBytes
+
+    if (this._buffer) {
+      rawCSVString = this._buffer + rawCSVString
+      this._buffer = null
+      this._isPart = false
     }
 
-    _transform(chunk, encoding, cb)  {
-        if(encoding !== 'utf-8') {
-            this.emit('error', new Error('Only UTF-8 files are supported.'))
-            return cb()
-        }
-        let rawCSVString = chunk.toString()
-        this._readBytes += chunk.length
-        this._streamHasData = this._readBytes !== this._allBytes
+    this._arr = rawCSVString.split('\n')
 
-        if(this._buffer) { 
-            rawCSVString = this._buffer + rawCSVString
-            this._buffer = null
-            this._isPart = false
-        }
-
-        this._arr = rawCSVString.split('\n')
-        this._separator = !this._separator ? separatorDetector(this._arr[0], this._arr[1]) : this._separator
-
-        if(this._isFirstChunk) this._headers = this._arr.shift().trim().split(this._separator)
-
-        let lastChar = rawCSVString[rawCSVString.length - 1]
-        if(lastChar !== '\n') { 
-            this._isPart = true
-        } 
-
-        if(this._isPart) this._buffer = this._arr.pop()
-
-        let parsedCSV = this._parseCSVBody()
-
-        let jsonData = this._isFirstChunk ? `[ ${parsedCSV}` : parsedCSV 
-        if(this._streamHasData) jsonData += ','
-
-        this._isFirstChunk = false
-
-        cb(null, jsonData) 
+    if (this._isFirstChunk) {
+      this._separator = separatorDetector(this._arr[0], this._arr[1], this._separator)
+      if (typeof this._separator !== 'string') {
+        return this.emit('error', this._separator)
+      }
+      this._headers = this._arr.shift().trim().split(this._separator)
     }
 
-    _parseCSVBody(isLastChunk = false) { 
-        let arr = isLastChunk ? [this._buffer] : this._arr
-        let jsonData = arr.map(item => {
-            let row = item.split(this._separator)
-            let jsonItem = row.map((item, i) => {
-               return `\"${this._headers[i]}\" : \"${item.trim()}\"`
-            })
-            return `{ ${jsonItem.join(',')} }`
-        })
-        return isLastChunk ? `, ${jsonData.join(',')} ]` : jsonData.join(',')
+    const lastChar = rawCSVString[rawCSVString.length - 1]
+    if (lastChar !== '\n') {
+      this._isPart = true
+    } else {
+      this._arr.pop()
     }
 
-    _flush(callback) {
-        callback(null, this._parseCSVBody(true))
-    }
+    if (this._isPart) this._buffer = this._arr.pop()
+
+    const parsedCSV = this._parseCSVBody()
+
+    let jsonData = this._isFirstChunk ? `[ ${parsedCSV}` : parsedCSV
+    if (this._streamHasData) jsonData += ','
+
+    this._isFirstChunk = false
+
+    cb(null, jsonData)
+  }
+
+  _parseCSVBody (isLastChunk = false) {
+    const arr = isLastChunk ? [this._buffer] : this._arr
+    const jsonData = arr.map(item => {
+      const row = item.split(this._separator)
+      const jsonItem = row.map((item, i) => {
+        return `"${this._headers[i]}" : "${item.trim()}"`
+      })
+      return `{ ${jsonItem.join(',')} }`
+    })
+    return isLastChunk ? `, ${jsonData.join(',')} ]` : jsonData.join(',')
+  }
+
+  _flush (callback) {
+    callback(null, this._parseCSVBody(true))
+  }
 }
 
 module.exports = {
-    ParseCSVStream
+  ParseCSVStream
 }

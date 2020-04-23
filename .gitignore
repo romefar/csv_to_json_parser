@@ -1,4 +1,5 @@
 /node_modules
+/bin
 small_*.csv
-*.json
+moock_*.json
 *.txt
