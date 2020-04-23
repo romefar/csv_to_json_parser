@@ -13,7 +13,7 @@ Includes three commands:
 ## Installation
 
 ```bash
-npm i testing-csv-parser
+npm i csv_to_json_parser -g
 ```
 ---
 
