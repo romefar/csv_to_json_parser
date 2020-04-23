@@ -1,6 +1,6 @@
 {
-  "name": "csv_to_json_parser",
-  "version": "1.0.0",
+  "name": "testing_csv_node_parser",
+  "version": "1.0.2",
   "description": "CSV to JSON parser.",
   "main": "index.js",
   "preferGlobal": true,
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/romefar/csv_to_json_parser.git"
   },
-  "keywords": [],
+  "keywords": ["csv", "json"],
   "author": "romefar",
   "license": "ISC",
   "bugs": {
