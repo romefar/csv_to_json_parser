@@ -1,5 +1,4 @@
 # CSV <=> JSON parser
-TEST UPLOAD! DO NOT USE IT. 
 
 A simple parser that provides CSV to JSON and JSON to CSV parsing. 
 Includes three commands:
